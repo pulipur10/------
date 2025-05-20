@@ -1,0 +1,91 @@
+<!-- write.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>글쓰기 - 벗들의 민족</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px;
+      background-color: #fefefe;
+    }
+
+    .form-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: white;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .btn {
+      background-color: rgb(0, 70, 42);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>새 글 작성</h2>
+    <label>이름</label>
+    <input type="text" id="input-name">
+
+    <label>보기 태그</label>
+    <select id="input-tag">
+      <option value="혼밥">혼밥</option>
+      <option value="카공">카공</option>
+      <option value="한식">한식</option>
+      <option value="일식">일식</option>
+    </select>
+
+    <label>종류</label>
+    <input type="text" id="input-type">
+
+    <label>브레이크 타임</label>
+    <input type="text" id="input-break">
+
+    <button id="submit-btn" class="btn">등록</button>
+  </div>
+
+  <script>
+    document.getElementById('submit-btn').addEventListener('click', () => {
+      const name = document.getElementById('input-name').value.trim();
+      const tag = document.getElementById('input-tag').value;
+      const type = document.getElementById('input-type').value.trim();
+      const breakTime = document.getElementById('input-break').value.trim();
+
+      if (name && tag && type) {
+        alert(`등록 완료!\n\n이름: ${name}\n태그: ${tag}\n종류: ${type}\n브레이크 타임: ${breakTime || '-'}`);
+        window.location.href = 'index.html';  // 등록 후 메인으로 이동
+      } else {
+        alert('모든 입력을 채워주세요!');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>헬로 보안 - 이화 맛집/카페</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header>
+    <h1>🍽️ 헬로 보안 - 이화여대 맛집/카페 리스트</h1>
+    <nav>
+      <a href="{{ url_for('index') }}">홈</a> |
+      <a href="{{ url_for('add') }}">장소 등록하기</a>
+    </nav>
+    <hr>
+  </header>
+
+  <!-- 🔍 검색 / 태그 필터 UI -->
+  <section>
+    <form method="get" action="{{ url_for('search') }}">
+      <input type="text" name="keyword" placeholder="가게 이름, 태그로 검색" />
+      <select name="tag">
+        <option value="">전체 태그</option>
+        <option value="혼밥">혼밥</option>
+        <option value="카공">카공</option>
+        <option value="데이트">데이트</option>
+        <option value="가성비">가성비</option>
+      </select>
+      <button type="submit">검색</button>
+    </form>
+  </section>
+
+  <hr>
+
+  <!-- 📋 리스트 출력 영역 -->
+  <main>
+    <ul class="place-list">
+      {% for place in places %}
+        <li class="place-card">
+          <h2>{{ place.name }}</h2>
+          <p>📍 위치: {{ place.location }}</p>
+          <p>🏷️ 태그: {{ place.tags }}</p>
+          <p>⭐ 평점: {{ place.rating }}점</p>
+          <p>🕒 영업시간: {{ place.hours }}</p>
+          <p>⏸️ 브레이크타임: {{ place.break_time }}</p>
+          <a href="{{ place.map_link }}" target="_blank">📌 지도에서 보기</a>
+        </li>
+      {% else %}
+        <li>등록된 장소가 아직 없어요!</li>
+      {% endfor %}
+    </ul>
+  </main>
+
+  <footer>
+    <hr>
+    <p>© 2025 헬로 보안 팀</p>
+  </footer>
+
+</body>
+</html>

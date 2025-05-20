@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>벗들의 민족</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px;
+      background-color: #fefefe;
+    }
+    .top-bar, .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bottom-bar {
+      justify-content: center;
+    }
+    h1 { font-size: 32px; margin: 0; }
+    .btn {
+      background-color: rgb(0, 70, 42);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    .tag-area { margin: 20px 0; }
+    .tag {
+      display: inline-block;
+      padding: 6px 12px;
+      margin: 5px;
+      border: 1px solid #000;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tag.active {
+      background-color: #000;
+      color: #fff;
+    }
+    .search-bar { margin-top: 20px; }
+    .selected-tag {
+      display: inline-block;
+      margin: 4px;
+      padding: 5px 10px;
+      border: 1px solid #888;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      font-size: 14px;
+    }
+    .selected-tag .remove {
+      margin-left: 8px;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 99;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 70, 42);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 30px;
+      border-radius: 8px;
+      width: 300px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <h1>벗들의 민족</h1>
+    <button class="btn">글쓰기</button>
+  </div>
+
+  <h3>추천이 많은</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>보기</th>
+        <th>종류</th>
+        <th>브레이크 타임</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>연서카페</td>
+        <td>카공하기 좋은</td>
+        <td>카페</td>
+        <td>월요일 휴무</td>
+      </tr>
+      <tr>
+        <td>맛있는라면</td>
+        <td>혼밥하기 좋은</td>
+        <td>분식</td>
+        <td>24시간</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="tag-area">
+    <strong>태그별</strong><br/>
+    <span class="tag">혼밥</span>
+    <span class="tag">카공</span>
+    <span class="tag">한식</span>
+    <span class="tag">일식</span>
+  </div>
+
+  <div class="search-bar">
+    <div id="selected-tags"></div>
+    <button id="search-btn" class="btn">검색</button>
+  </div>
+
+  <h3>전체글 → 검색결과</h3>
+  <table id="result-table">
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>보기</th>
+        <th>종류</th>
+        <th>브레이크 타임</th>
+      </tr>
+    </thead>
+    <tbody id="result-body"></tbody>
+  </table>
+
+  <div class="pagination">« 1-10 »</div>
+  <div class="bottom-bar" style="margin-top: 40px;">
+    <button class="btn">글쓰기</button>
+  </div>
+
+  <div id="write-modal" class="modal">
+    <div class="modal-content">
+      <span id="modal-close" class="close">&times;</span>
+      <h2>새 글 작성</h2>
+      <label>이름</label><br>
+      <input type="text" id="input-name"><br><br>
+      <label>보기 태그</label><br>
+      <select id="input-tag">
+        <option value="혼밥">혼밥</option>
+        <option value="카공">카공</option>
+        <option value="한식">한식</option>
+        <option value="일식">일식</option>
+      </select><br><br>
+      <label>종류</label><br>
+      <input type="text" id="input-type"><br><br>
+      <label>브레이크 타임</label><br>
+      <input type="text" id="input-break"><br><br>
+      <button id="submit-btn" class="btn">등록</button>
+    </div>
+  </div>
+
+  <script>
+    const tagList = document.querySelectorAll('.tag');
+    const selectedTagsDiv = document.getElementById('selected-tags');
+
+    function renderSelectedTags() {
+      selectedTagsDiv.innerHTML = '';
+      tagList.forEach(tag => {
+        if (tag.classList.contains('active')) {
+          const tagName = tag.textContent;
+          const span = document.createElement('span');
+          span.className = 'selected-tag';
+          span.innerHTML = `${tagName} <span class="remove" data-name="${tagName}">❌</span>`;
+          selectedTagsDiv.appendChild(span);
+        }
+      });
+      document.querySelectorAll('.remove').forEach(removeBtn => {
+        removeBtn.addEventListener('click', () => {
+          const name = removeBtn.getAttribute('data-name');
+          tagList.forEach(tag => {
+            if (tag.textContent === name) tag.classList.remove('active');
+          });
+          renderSelectedTags();
+        });
+      });
+    }
+
+    tagList.forEach(tag => {
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('active');
+        renderSelectedTags();
+      });
+    });
+
+    const resultBody = document.getElementById('result-body');
+    function renderResults(filtered) {
+      resultBody.innerHTML = '';
+      if (filtered.length === 0) {
+        resultBody.innerHTML = `<tr><td colspan="4">결과 없음</td></tr>`;
+        return;
+      }
+      filtered.forEach(place => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${place.name}</td>
+          <td>${place.tag}하기 좋은</td>
+          <td>${place.type}</td>
+          <td>${place.break}</td>
+        `;
+        resultBody.appendChild(row);
+      });
+    }
+
+    document.getElementById('search-btn').addEventListener('click', () => {
+      const activeTags = [...document.querySelectorAll('.tag.active')].map(tag => tag.textContent);
+      fetch('http://localhost:8080/api/posts')
+        .then(res => res.json())
+        .then(data => {
+          const filtered = data.filter(place => activeTags.includes(place.tag));
+          renderResults(filtered);
+        })
+        .catch(err => {
+          console.error(err);
+          alert('검색 실패');
+        });
+    });
+
+    const modal = document.getElementById('write-modal');
+    const writeBtns = document.querySelectorAll('.btn');
+    const closeModal = document.getElementById('modal-close');
+
+    writeBtns.forEach(btn => {
+      if (btn.textContent === '글쓰기') {
+        btn.addEventListener('click', () => { modal.style.display = 'block'; });
+      }
+    });
+
+    closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+    document.getElementById('submit-btn').addEventListener('click', () => {
+      const name = document.getElementById('input-name').value.trim();
+      const tag = document.getElementById('input-tag').value;
+      const type = document.getElementById('input-type').value.trim();
+      const breakTime = document.getElementById('input-break').value.trim();
+
+      if (name && tag && type) {
+        fetch('http://localhost:8080/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, tag, type, break: breakTime || '-' })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('서버 오류');
+          return res.json();
+        })
+        .then(data => {
+          alert('등록 완료!');
+          modal.style.display = 'none';
+          const activeTags = [...document.querySelectorAll('.tag.active')].map(tag => tag.textContent);
+          if (activeTags.includes(data.tag)) {
+            renderResults([data]);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('등록 실패');
+        });
+      } else {
+        alert('모든 입력을 채워주세요!');
+      }
+    });
+  </script>
+</body>
+</html>
